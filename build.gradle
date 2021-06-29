@@ -1,9 +1,7 @@
-//import org.apache.tools.ant.filters.ReplaceTokens
-
 plugins {
     id 'java'
-    id "io.freefair.lombok" version "5.3.0"
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id "io.freefair.lombok" version "6.0.0-m2"
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 
@@ -26,15 +24,10 @@ repositories {
 }
 
 shadowJar {
-    relocate 'com.github.stefvanschie.inventoryframework', 'ru.wbjh.shulkerstorage.shade.inventoryframework'
+    relocate 'com.github.stefvanschie.inventoryframework', 'ru.wbjh.shulkerstorage.shadow.inventoryframework'
 }
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
+    implementation 'com.github.stefvanschie.inventoryframework:IF:0.9.9'
 }
-
-//processResources {
-//    from(sourceSets.main.resources.srcDirs) {
-//        filter ReplaceTokens, tokens: [version: version]
-//    }
-//}

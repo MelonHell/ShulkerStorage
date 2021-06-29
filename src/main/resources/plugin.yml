@@ -1,5 +1,9 @@
 name: WBJH-ShulkerStorage
-version: @version@
+version: 1.0
 main: ru.wbjh.shulkerstorage.Main
 api-version: 1.17
 authors: [ MelonHell ]
+commands:
+  sstest:
+    usage: /sstest
+    permission: op
