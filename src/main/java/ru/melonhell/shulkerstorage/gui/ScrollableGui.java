@@ -1,4 +1,4 @@
-package ru.wbjh.shulkerstorage.gui;
+package ru.melonhell.shulkerstorage.gui;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
@@ -9,34 +9,29 @@ import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
-import ru.wbjh.shulkerstorage.*;
+import ru.melonhell.shulkerstorage.Main;
+import ru.melonhell.shulkerstorage.SortUtils;
+import ru.melonhell.shulkerstorage.StorageItem;
+import ru.melonhell.shulkerstorage.storage.Storage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class ScrollableGui implements IGui {
+public class ScrollableGui extends AbstractGui {
 
-    private final Storage storage;
-    private final ChestGui gui;
     private final MasonryPane masonryPane;
     private final StaticPane navPane;
     private final List<Pane> linePaneList = new ArrayList<>();
-    private final ItemCreator itemCreator;
     int scrollPosition = 0;
-    SortUtils.SortType sortType = SortUtils.SortType.ID;
-    boolean sortReverse = false;
 
     public ScrollableGui(Storage storage) {
-        itemCreator = new ItemCreator(this);
-        this.storage = storage;
-        gui = new ChestGui(6, "ShulkerStorage");
+        super(storage, new ChestGui(6, "ShulkerStorage"));
         masonryPane = new MasonryPane(8, 6);
         masonryPane.setOrientation(Orientable.Orientation.VERTICAL);
-        gui.addPane(masonryPane);
+        chestGui.addPane(masonryPane);
 
         navPane = new StaticPane(8, 0, 1, 6);
         // SCROLL UP
@@ -51,16 +46,18 @@ public class ScrollableGui implements IGui {
         navPane.addItem(new GuiItem(new ItemStack(Material.PAPER), inventoryClickEvent -> {
             if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) {
                 changeSortType();
+                updateSortItemMeta(inventoryClickEvent.getCurrentItem());
+                refresh();
             } else if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_HALF)) {
                 sortReverse = !sortReverse;
+                updateSortItemMeta(inventoryClickEvent.getCurrentItem());
                 refresh();
             }
         }), 0, 1);
-        gui.addPane(navPane);
+        chestGui.addPane(navPane);
 
-        gui.setOnTopClick(inventoryClickEvent -> {
+        chestGui.setOnTopClick(inventoryClickEvent -> {
             inventoryClickEvent.setCancelled(true);
-//            inventoryClickEvent.getWhoClicked().sendMessage("top click " + inventoryClickEvent.getAction().name());
             if (inventoryClickEvent.getAction().equals(InventoryAction.PLACE_ALL)) {
                 ItemStack cursor = inventoryClickEvent.getCursor();
                 if (cursor != null) {
@@ -71,12 +68,11 @@ public class ScrollableGui implements IGui {
             }
         });
 
-        gui.setOnTopDrag(inventoryDragEvent -> {
+        chestGui.setOnTopDrag(inventoryDragEvent -> {
             inventoryDragEvent.setCancelled(true);
-//            inventoryDragEvent.getWhoClicked().sendMessage("top drag " + inventoryDragEvent.getType().name());
         });
 
-        gui.setOnBottomClick(inventoryClickEvent -> {
+        chestGui.setOnBottomClick(inventoryClickEvent -> {
             if (inventoryClickEvent.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 inventoryClickEvent.setCancelled(true);
                 ItemStack cursor = inventoryClickEvent.getClickedInventory().getItem(inventoryClickEvent.getSlot());
@@ -86,19 +82,7 @@ public class ScrollableGui implements IGui {
                 }
                 refresh();
             }
-//            inventoryClickEvent.getWhoClicked().sendMessage("bottom click " + inventoryClickEvent.getAction().name());
         });
-
-//        gui.setOnBottomDrag(inventoryDragEvent -> {
-//            inventoryDragEvent.getWhoClicked().sendMessage("bottom drag " + inventoryDragEvent.getType().name());
-//        });
-    }
-
-    private void changeSortType() {
-        int val = sortType.ordinal()+1;
-        if (val >= SortUtils.SortType.values().length) val = 0;
-        sortType = SortUtils.SortType.values()[val];
-        refresh();
     }
 
     private void scroll(int i) {
@@ -115,11 +99,7 @@ public class ScrollableGui implements IGui {
                 masonryPane.addPane(linePaneList.get(i + scrollPosition));
             }
         }
-        gui.update();
-    }
-
-    public void show(Player player) {
-        gui.show(player);
+        chestGui.update();
     }
 
     public void refresh() {

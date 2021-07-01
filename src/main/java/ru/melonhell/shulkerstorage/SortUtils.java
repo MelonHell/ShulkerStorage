@@ -1,4 +1,4 @@
-package ru.wbjh.shulkerstorage;
+package ru.melonhell.shulkerstorage;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,13 +15,13 @@ public class SortUtils {
     public static void sort(List<StorageItem> storageItemList, SortType sortType, boolean reverse) {
         switch (sortType) {
             case ID:
-                storageItemList.sort(Comparator.comparing(StorageItem::getType));
+                storageItemList.sort(Comparator.comparing(storageItem -> storageItem.getItemStack().getType()));
                 break;
             case AMOUNT:
                 storageItemList.sort(Comparator.comparingInt(storageItem -> -storageItem.getAmount()));
                 break;
             case NAME:
-                storageItemList.sort(Comparator.comparing(storageItem -> storageItem.getType().name()));
+                storageItemList.sort(Comparator.comparing(storageItem -> storageItem.getItemStack().getType().name()));
                 break;
         }
         if (reverse) Collections.reverse(storageItemList);

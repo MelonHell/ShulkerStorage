@@ -1,6 +1,6 @@
-name: WBJH-ShulkerStorage
+name: ShulkerStorage
 version: 1.0
-main: ru.wbjh.shulkerstorage.Main
+main: ru.melonhell.shulkerstorage.Main
 api-version: 1.17
 authors: [ MelonHell ]
 commands:

@@ -1,4 +1,4 @@
-package ru.wbjh.shulkerstorage.gui;
+package ru.melonhell.shulkerstorage.gui;
 
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
@@ -9,7 +9,7 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import ru.wbjh.shulkerstorage.Storage;
+import ru.melonhell.shulkerstorage.storage.Storage;
 
 import java.util.ArrayList;
 import java.util.List;

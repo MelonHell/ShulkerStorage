@@ -1,0 +1,16 @@
+frame_materials:
+  bottom:
+    vertex: NETHERITE_BLOCK
+    edge: LAPIS_BLOCK
+    face: IRON_BLOCK
+  side:
+    edge: IRON_BLOCK
+    face: GLASS
+  top:
+    vertex: REDSTONE_BLOCK
+    edge: IRON_BLOCK
+    face: GLASS
+
+limits:
+  width: 5
+  height: 7

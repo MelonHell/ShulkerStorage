@@ -1,14 +1,13 @@
-package ru.wbjh.shulkerstorage;
+package ru.melonhell.shulkerstorage.storage;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import ru.melonhell.shulkerstorage.StorageItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,16 +22,13 @@ public class Storage {
 
         List<Block> blockList = new ArrayList<>();
 
-        Location loc1 = block1.getLocation();
-        Location loc2 = block2.getLocation();
+        int minX = Math.min(block1.getX(), block2.getX());
+        int minY = Math.min(block1.getY(), block2.getY());
+        int minZ = Math.min(block1.getZ(), block2.getZ());
 
-        int minX = Math.min(loc1.getBlockX(), loc2.getBlockX());
-        int minY = Math.min(loc1.getBlockY(), loc2.getBlockY());
-        int minZ = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
-
-        int maxX = Math.max(loc1.getBlockX(), loc2.getBlockX());
-        int maxY = Math.max(loc1.getBlockY(), loc2.getBlockY());
-        int maxZ = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
+        int maxX = Math.max(block1.getX(), block2.getX());
+        int maxY = Math.max(block1.getY(), block2.getY());
+        int maxZ = Math.max(block1.getZ(), block2.getZ());
 
         // Check valid
         if (maxX - minX < 2 || maxY - minY < 2 || maxZ - minZ < 2) return blockList;
@@ -73,16 +69,16 @@ public class Storage {
         return itemStackList;
     }
 
-    private boolean hasMaterial(List<StorageItem> storageItemList, Material material) {
-        for (StorageItem storageItem : storageItemList) {
-            if (storageItem.getType().equals(material)) return true;
-        }
-        return false;
-    }
+//    private boolean hasMaterial(List<StorageItem> storageItemList, Material material) {
+//        for (StorageItem storageItem : storageItemList) {
+//            if (storageItem.getType().equals(material)) return true;
+//        }
+//        return false;
+//    }
 
     private boolean addIfHasStorageItem(List<StorageItem> storageItemList, ItemStack itemStack) {
         for (StorageItem storageItem : storageItemList) {
-            if (storageItem.getType().equals(itemStack.getType())) {
+            if (storageItem.getItemStack().isSimilar(itemStack)) {
                 storageItem.setAmount(storageItem.getAmount() + itemStack.getAmount());
                 return true;
             }
@@ -92,7 +88,7 @@ public class Storage {
 
     private void addToStorageItemList(List<StorageItem> storageItemList, ItemStack itemStack) {
         boolean foo = addIfHasStorageItem(storageItemList, itemStack);
-        if (!foo) storageItemList.add(new StorageItem(itemStack.getType(), itemStack.getAmount()));
+        if (!foo) storageItemList.add(new StorageItem(itemStack, itemStack.getAmount()));
     }
 
     public List<StorageItem> getStorageItems() {
@@ -109,7 +105,7 @@ public class Storage {
             for (int i = 0; i < inventory.getSize(); i++) {
                 ItemStack itemStack = inventory.getItem(i);
                 if (itemStack == null) continue;
-                if (itemStack.getType().equals(storageItem.getType())) {
+                if (itemStack.isSimilar(storageItem.getItemStack())) {
                     if (neededItemStack == null) {
                         if (itemStack.getAmount() == storageItem.getAmount()) {
                             inventory.setItem(i, null);

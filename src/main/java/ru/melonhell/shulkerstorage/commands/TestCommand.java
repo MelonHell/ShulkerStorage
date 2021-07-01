@@ -1,4 +1,4 @@
-package ru.wbjh.shulkerstorage.commands;
+package ru.melonhell.shulkerstorage.commands;
 
 import org.bukkit.Material;
 import org.bukkit.command.Command;
