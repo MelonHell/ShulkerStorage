@@ -10,10 +10,10 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import ru.melonhell.shulkerstorage.Main;
-import ru.melonhell.shulkerstorage.SortUtils;
-import ru.melonhell.shulkerstorage.StorageItem;
+import ru.melonhell.shulkerstorage.storage.StorageItem;
 import ru.melonhell.shulkerstorage.storage.Storage;
 
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import java.util.List;
 @Getter
 public class ScrollableGui extends AbstractGui {
 
+    private final Material background = Material.LIGHT_GRAY_STAINED_GLASS_PANE;
     private final MasonryPane masonryPane;
     private final StaticPane navPane;
     private final List<Pane> linePaneList = new ArrayList<>();
@@ -35,6 +36,7 @@ public class ScrollableGui extends AbstractGui {
 
         navPane = new StaticPane(8, 0, 1, 6);
         // SCROLL UP
+        navPane.fillWith(new ItemStack(background));
         navPane.addItem(new GuiItem(new ItemStack(Material.ARROW), inventoryClickEvent -> {
             if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) scroll(-1);
         }), 0, 0);
@@ -56,23 +58,43 @@ public class ScrollableGui extends AbstractGui {
         }), 0, 1);
         chestGui.addPane(navPane);
 
+        chestGui.setOnClose(inventoryCloseEvent -> {
+            storage.getActiveGuis().remove(this);
+        });
+
         chestGui.setOnTopClick(inventoryClickEvent -> {
+//            inventoryClickEvent.getWhoClicked().sendMessage("top click " + inventoryClickEvent.getAction());
             inventoryClickEvent.setCancelled(true);
+            if (inventoryClickEvent.getAction().equals(InventoryAction.PLACE_SOME)) {
+//                inventoryClickEvent.getWhoClicked().sendMessage("PLACE_SOME " + inventoryClickEvent.getClickedInventory());
+//                if (inventoryClickEvent.getClickedInventory().getType().equals(InventoryType.PLAYER))
+                inventoryClickEvent.setCancelled(false);
+            }
             if (inventoryClickEvent.getAction().equals(InventoryAction.PLACE_ALL)) {
                 ItemStack cursor = inventoryClickEvent.getCursor();
                 if (cursor != null) {
                     ItemStack drop = storage.putItemStack(cursor);
                     inventoryClickEvent.setCursor(drop);
                 }
-                refresh();
+                refreshAll();
+            }
+            if (inventoryClickEvent.getAction().equals(InventoryAction.SWAP_WITH_CURSOR) && inventoryClickEvent.getClick().isLeftClick()) {
+                ItemStack cursor = inventoryClickEvent.getCursor();
+                if (cursor != null) {
+                    ItemStack drop = storage.putItemStack(cursor);
+                    inventoryClickEvent.setCursor(drop);
+                }
+                refreshAll();
             }
         });
 
         chestGui.setOnTopDrag(inventoryDragEvent -> {
+//            inventoryDragEvent.getWhoClicked().sendMessage("top drag " + inventoryDragEvent.getType());
             inventoryDragEvent.setCancelled(true);
         });
 
         chestGui.setOnBottomClick(inventoryClickEvent -> {
+//            inventoryClickEvent.getWhoClicked().sendMessage("bottom click " + inventoryClickEvent.getAction());
             if (inventoryClickEvent.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 inventoryClickEvent.setCancelled(true);
                 ItemStack cursor = inventoryClickEvent.getClickedInventory().getItem(inventoryClickEvent.getSlot());
@@ -80,13 +102,13 @@ public class ScrollableGui extends AbstractGui {
                     ItemStack drop = storage.putItemStack(cursor);
                     inventoryClickEvent.getClickedInventory().setItem(inventoryClickEvent.getSlot(), drop);
                 }
-                refresh();
+                refreshAll();
             }
         });
     }
 
     private void scroll(int i) {
-        if (scrollPosition + i >= 0 && scrollPosition + i < linePaneList.size()) {
+        if (scrollPosition + i >= 0 && scrollPosition + i < linePaneList.size() - 5) {
             scrollPosition += i;
             updateGui();
         }
@@ -111,15 +133,21 @@ public class ScrollableGui extends AbstractGui {
         SortUtils.sort(storageItemList, sortType, sortReverse);
         linePaneList.clear();
         for (int i = 0; i <= storageItemList.size() / 8; i++) {
-            StaticPane outlinePane = new StaticPane(8, 1);
-            linePaneList.add(outlinePane);
+            StaticPane linePane = new StaticPane(8, 1);
+            linePaneList.add(linePane);
             for (int j = 0; j < 8; j++) {
                 int itemId = i * 8 + j;
                 if (itemId < storageItemList.size()) {
                     StorageItem storageItem = storageItemList.get(itemId);
-                    outlinePane.addItem(itemCreator.createItem(storageItem), j, 0);
+                    linePane.addItem(itemCreator.createItem(storageItem), j, 0);
                 }
             }
+            linePane.fillWith(new ItemStack(background));
+        }
+        for (int i = 0; i < 5; i++) {
+            StaticPane linePane = new StaticPane(8, 1);
+            linePaneList.add(linePane);
+            linePane.fillWith(new ItemStack(background));
         }
         updateGui();
     }

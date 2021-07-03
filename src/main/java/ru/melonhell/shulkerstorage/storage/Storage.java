@@ -7,7 +7,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.melonhell.shulkerstorage.StorageItem;
+import ru.melonhell.shulkerstorage.gui.IGui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,7 @@ import java.util.List;
 public class Storage {
     private final Block block1;
     private final Block block2;
+    private final List<IGui> activeGuis = new ArrayList<>();
 
     public List<Block> getBlocksInside() {
 

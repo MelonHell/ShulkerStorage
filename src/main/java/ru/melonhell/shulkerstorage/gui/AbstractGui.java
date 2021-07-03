@@ -5,9 +5,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import ru.melonhell.shulkerstorage.SortUtils;
 import ru.melonhell.shulkerstorage.storage.Storage;
-import ru.melonhell.shulkerstorage.ItemCreator;
 
 import java.util.Arrays;
 
@@ -23,6 +21,7 @@ public abstract class AbstractGui implements IGui {
         this.itemCreator = new ItemCreator(this);
         this.storage = storage;
         this.chestGui = chestGui;
+        storage.getActiveGuis().add(this);
     }
 
     public void show(Player player) {
@@ -43,4 +42,10 @@ public abstract class AbstractGui implements IGui {
     }
 
     public abstract void refresh();
+
+    public void refreshAll() {
+        for (IGui activeGui : storage.getActiveGuis()) {
+            activeGui.refresh();
+        }
+    }
 }

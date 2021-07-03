@@ -1,4 +1,4 @@
-package ru.melonhell.shulkerstorage;
+package ru.melonhell.shulkerstorage.storage;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

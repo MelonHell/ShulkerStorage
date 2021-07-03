@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Config {
 
-    private Main plugin;
+    private final Main plugin;
 
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
@@ -27,6 +27,9 @@ public class Config {
     public List<Material> FRAME_TOP_FACE;
     public int LIMITS_WIDTH;
     public int LIMITS_HEIGHT;
+    public String TERMINAL_TEXTURE;
+    public String TERMINAL_NAME;
+    public List<String> TERMINAL_LORE;
 
     private List<Material> getMaterialList(String path) {
         if (!customConfig.isList(path)) {
@@ -55,6 +58,8 @@ public class Config {
         Reader defConfigStream = new InputStreamReader(plugin.getResource("config.yml"), "UTF8");
         YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
         customConfig.setDefaults(defConfig);
+        customConfig.options().copyDefaults(true);
+        customConfig.save(customConfigFile);
 
         FRAME_BOTTOM_VERTEX = getMaterialList("frame_materials.bottom.vertex");
         FRAME_BOTTOM_EDGE = getMaterialList("frame_materials.bottom.edge");
@@ -67,6 +72,10 @@ public class Config {
 
         LIMITS_WIDTH = customConfig.getInt("limits.width");
         LIMITS_HEIGHT = customConfig.getInt("limits.height");
+
+        TERMINAL_TEXTURE = customConfig.getString("terminal.texture");
+        TERMINAL_NAME = customConfig.getString("terminal.name");
+        TERMINAL_LORE  = customConfig.getStringList("terminal.lore");
 
     }
 

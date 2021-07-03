@@ -1,4 +1,6 @@
-package ru.melonhell.shulkerstorage;
+package ru.melonhell.shulkerstorage.gui;
+
+import ru.melonhell.shulkerstorage.storage.StorageItem;
 
 import java.util.Collections;
 import java.util.Comparator;
