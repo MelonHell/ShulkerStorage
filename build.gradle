@@ -1,11 +1,13 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
-    id "io.freefair.lombok" version "6.0.0-m2"
+    id 'io.freefair.lombok' version '6.0.0-m2'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 
-group = 'ru.wbjh'
+group = 'ru.melonhell'
 version = '1.0-SNAPSHOT'
 
 sourceCompatibility = '1.8'
@@ -22,6 +24,7 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
+    maven { url = 'https://jitpack.io' } // RedLib
 }
 
 shadowJar {
@@ -30,5 +33,10 @@ shadowJar {
 
 dependencies {
     compileOnly 'org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT'
+    compileOnly 'com.github.Redempt:RedLib:5.0.3'
     implementation 'com.github.stefvanschie.inventoryframework:IF:0.9.9'
+}
+
+processResources {
+    filter ReplaceTokens, tokens: [version: version]
 }

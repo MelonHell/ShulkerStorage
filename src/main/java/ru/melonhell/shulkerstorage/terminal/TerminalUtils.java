@@ -1,9 +1,7 @@
 package ru.melonhell.shulkerstorage.terminal;
 
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -14,8 +12,8 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import ru.melonhell.shulkerstorage.HeadUtils;
-import ru.melonhell.shulkerstorage.Main;
-import ru.melonhell.shulkerstorage.configs.Config;
+import ru.melonhell.shulkerstorage.ShulkerStorage;
+import ru.melonhell.shulkerstorage.configs.MainConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,22 +22,23 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class TerminalUtils {
 
-    final Config config;
-    final Main plugin;
+    final MainConfig config;
+    final ShulkerStorage plugin;
 
     public ItemStack getTerminal() {
-        String name = ChatColor.translateAlternateColorCodes('&', config.TERMINAL_NAME + "");
-        List<String> lore = new ArrayList<>();
-        for (String s : config.TERMINAL_LORE) {
-            lore.add(ChatColor.translateAlternateColorCodes('&', s + ""));
-        }
-        ItemStack item = HeadUtils.getHead(config.TERMINAL_TEXTURE, name, lore);
-        ItemMeta meta = item.getItemMeta();
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
-        NamespacedKey key = new NamespacedKey(plugin, "terminal");
-        pdc.set(key, PersistentDataType.INTEGER, 1);
-        item.setItemMeta(meta);
-        return item;
+        return null;
+//        String name = ChatColor.translateAlternateColorCodes('&', config.TERMINAL_NAME + "");
+//        List<String> lore = new ArrayList<>();
+//        for (String s : config.TERMINAL_LORE) {
+//            lore.add(ChatColor.translateAlternateColorCodes('&', s + ""));
+//        }
+//        ItemStack item = HeadUtils.getHead(config.TERMINAL_TEXTURE, name, lore);
+//        ItemMeta meta = item.getItemMeta();
+//        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+//        NamespacedKey key = new NamespacedKey(plugin, "terminal");
+//        pdc.set(key, PersistentDataType.INTEGER, 1);
+//        item.setItemMeta(meta);
+//        return item;
     }
 
     public boolean isTerminal(ItemStack item) {

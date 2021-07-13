@@ -10,9 +10,8 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-import ru.melonhell.shulkerstorage.Main;
+import ru.melonhell.shulkerstorage.ShulkerStorage;
 import ru.melonhell.shulkerstorage.storage.StorageItem;
 import ru.melonhell.shulkerstorage.storage.Storage;
 
@@ -125,7 +124,7 @@ public class ScrollableGui extends AbstractGui {
     }
 
     public void refresh() {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), this::refresh1 , 1);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ShulkerStorage.getPlugin(ShulkerStorage.class), this::refresh1 , 1);
     }
 
     private void refresh1() {

@@ -1,8 +1,10 @@
 name: ShulkerStorage
-version: 1.0
-main: ru.melonhell.shulkerstorage.Main
-api-version: 1.17
+version: @version@
+main: ru.melonhell.shulkerstorage.ShulkerStorage
+api-version: 1.13
 authors: [ MelonHell ]
+depend:
+  - RedLib
 commands:
   sstest:
     usage: /sstest

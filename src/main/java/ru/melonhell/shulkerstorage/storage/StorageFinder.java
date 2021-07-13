@@ -1,29 +1,35 @@
 package ru.melonhell.shulkerstorage.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import ru.melonhell.shulkerstorage.configs.Config;
+import ru.melonhell.shulkerstorage.Debug;
+import ru.melonhell.shulkerstorage.configs.MainConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 @RequiredArgsConstructor
 public class StorageFinder {
 
-    private final Config config;
+    private final MainConfig config;
     private final List<Storage> storageList = new ArrayList<>();
 
     public boolean isFrame(Block block) {
         Material type = block.getType();
-        List<List<Material>> allMaterials = Arrays.asList(config.FRAME_BOTTOM_EDGE, config.FRAME_BOTTOM_FACE, config.FRAME_BOTTOM_VERTEX, config.FRAME_SIDE_EDGE, config.FRAME_SIDE_FACE, config.FRAME_TOP_EDGE, config.FRAME_TOP_FACE, config.FRAME_TOP_VERTEX);
+        List<List<Material>> allMaterials = Arrays.asList(config.getMaterialBottomEdge(), config.getMaterialBottomFace(), config.getMaterialBottomVertex(), config.getMaterialSideEdge(), config.getMaterialSideFace(), config.getMaterialTopEdge(), config.getMaterialTopFace(), config.getMaterialTopVertex());
         for (List<Material> allMaterial : allMaterials) {
-            if (allMaterial.contains(type)) return true;
+            for (Material material : allMaterial) {
+                Debug.info("block = " + type + ", test = " + material);
+                if (Objects.equals(type, material)) return true;
+            }
+
+//            if (allMaterial.contains(type)) return true;
         }
         return false;
     }
@@ -42,79 +48,79 @@ public class StorageFinder {
 
         if (maxX - minX < 2 || maxY - minY < 2 || maxZ - minZ < 2) return false;
 
-//        Bukkit.getLogger().info("maxX - minX + 1 = " + (maxX - minX + 1));
-//        Bukkit.getLogger().info("config.LIMITS_WIDTH = " + config.LIMITS_WIDTH);
-        if (maxX - minX + 1 > config.LIMITS_WIDTH) return false;
-        if (maxY - minY + 1 > config.LIMITS_HEIGHT) return false;
-        if (maxZ - minZ + 1 > config.LIMITS_WIDTH) return false;
+        Debug.info("maxX - minX + 1 = " + (maxX - minX + 1));
+        Debug.info("config.LIMITS_WIDTH = " + config.getLimitsWidth());
+        if (maxX - minX + 1 > config.getLimitsWidth()) return false;
+        if (maxY - minY + 1 > config.getLimitsHeight()) return false;
+        if (maxZ - minZ + 1 > config.getLimitsWidth()) return false;
 
         // faceBottom
-//        Bukkit.getLogger().info("faceBottom");
+        Debug.info("faceBottom");
         for (int x = minX + 1; x < maxX; x++) {
             for (int z = minZ + 1; z < maxZ; z++) {
-                if (!config.FRAME_BOTTOM_FACE.contains(world.getBlockAt(x, minY, z).getType())) return false;
+                if (!config.getMaterialBottomFace().contains(world.getBlockAt(x, minY, z).getType())) return false;
             }
         }
         // vertexBottom
-//        Bukkit.getLogger().info("vertexBottom");
-        if (!config.FRAME_BOTTOM_VERTEX.contains(world.getBlockAt(minX, minY, minZ).getType())) return false;
-        if (!config.FRAME_BOTTOM_VERTEX.contains(world.getBlockAt(minX, minY, maxZ).getType())) return false;
-        if (!config.FRAME_BOTTOM_VERTEX.contains(world.getBlockAt(maxX, minY, minZ).getType())) return false;
-        if (!config.FRAME_BOTTOM_VERTEX.contains(world.getBlockAt(maxX, minY, maxZ).getType())) return false;
+        Debug.info("vertexBottom");
+        if (!config.getMaterialBottomVertex().contains(world.getBlockAt(minX, minY, minZ).getType())) return false;
+        if (!config.getMaterialBottomVertex().contains(world.getBlockAt(minX, minY, maxZ).getType())) return false;
+        if (!config.getMaterialBottomVertex().contains(world.getBlockAt(maxX, minY, minZ).getType())) return false;
+        if (!config.getMaterialBottomVertex().contains(world.getBlockAt(maxX, minY, maxZ).getType())) return false;
         // edgeBottom
-//        Bukkit.getLogger().info("edgeBottom");
+        Debug.info("edgeBottom");
         for (int x = minX + 1; x < maxX; x++) {
-            if (!config.FRAME_BOTTOM_EDGE.contains(world.getBlockAt(x, minY, minZ).getType())) return false;
-            if (!config.FRAME_BOTTOM_EDGE.contains(world.getBlockAt(x, minY, maxZ).getType())) return false;
+            if (!config.getMaterialBottomEdge().contains(world.getBlockAt(x, minY, minZ).getType())) return false;
+            if (!config.getMaterialBottomEdge().contains(world.getBlockAt(x, minY, maxZ).getType())) return false;
         }
         for (int z = minZ + 1; z < maxZ; z++) {
-            if (!config.FRAME_BOTTOM_EDGE.contains(world.getBlockAt(minX, minY, z).getType())) return false;
-            if (!config.FRAME_BOTTOM_EDGE.contains(world.getBlockAt(maxX, minY, z).getType())) return false;
+            if (!config.getMaterialBottomEdge().contains(world.getBlockAt(minX, minY, z).getType())) return false;
+            if (!config.getMaterialBottomEdge().contains(world.getBlockAt(maxX, minY, z).getType())) return false;
         }
         // faceSide
-//        Bukkit.getLogger().info("faceSide");
+        Debug.info("faceSide");
         for (int y = minY + 1; y < maxY; y++) {
             for (int x = minX + 1; x < maxX; x++) {
-                if (!config.FRAME_SIDE_FACE.contains(world.getBlockAt(x, y, minZ).getType())) return false;
-                if (!config.FRAME_SIDE_FACE.contains(world.getBlockAt(x, y, maxZ).getType())) return false;
+                if (!config.getMaterialSideFace().contains(world.getBlockAt(x, y, minZ).getType())) return false;
+                if (!config.getMaterialSideFace().contains(world.getBlockAt(x, y, maxZ).getType())) return false;
             }
             for (int z = minZ + 1; z < maxZ; z++) {
-                if (!config.FRAME_SIDE_FACE.contains(world.getBlockAt(minX, y, z).getType())) return false;
-                if (!config.FRAME_SIDE_FACE.contains(world.getBlockAt(maxX, y, z).getType())) return false;
+                if (!config.getMaterialSideFace().contains(world.getBlockAt(minX, y, z).getType())) return false;
+                if (!config.getMaterialSideFace().contains(world.getBlockAt(maxX, y, z).getType())) return false;
             }
         }
         // edgeSide
-//        Bukkit.getLogger().info("edgeSide");
+        Debug.info("edgeSide");
         for (int y = minY + 1; y < maxY; y++) {
-            if (!config.FRAME_SIDE_EDGE.contains(world.getBlockAt(minX, y, minZ).getType())) return false;
-            if (!config.FRAME_SIDE_EDGE.contains(world.getBlockAt(minX, y, maxZ).getType())) return false;
-            if (!config.FRAME_SIDE_EDGE.contains(world.getBlockAt(maxX, y, minZ).getType())) return false;
-            if (!config.FRAME_SIDE_EDGE.contains(world.getBlockAt(maxX, y, maxZ).getType())) return false;
+            if (!config.getMaterialSideEdge().contains(world.getBlockAt(minX, y, minZ).getType())) return false;
+            if (!config.getMaterialSideEdge().contains(world.getBlockAt(minX, y, maxZ).getType())) return false;
+            if (!config.getMaterialSideEdge().contains(world.getBlockAt(maxX, y, minZ).getType())) return false;
+            if (!config.getMaterialSideEdge().contains(world.getBlockAt(maxX, y, maxZ).getType())) return false;
         }
         // faceTop
-//        Bukkit.getLogger().info("faceTop");
+        Debug.info("faceTop");
         for (int x = minX + 1; x < maxX; x++) {
             for (int z = minZ + 1; z < maxZ; z++) {
-                if (!config.FRAME_TOP_FACE.contains(world.getBlockAt(x, maxY, z).getType())) return false;
+                if (!config.getMaterialTopFace().contains(world.getBlockAt(x, maxY, z).getType())) return false;
             }
         }
         // vertexTop
-//        Bukkit.getLogger().info("vertexTop");
-        if (!config.FRAME_TOP_VERTEX.contains(world.getBlockAt(minX, maxY, minZ).getType())) return false;
-        if (!config.FRAME_TOP_VERTEX.contains(world.getBlockAt(minX, maxY, maxZ).getType())) return false;
-        if (!config.FRAME_TOP_VERTEX.contains(world.getBlockAt(maxX, maxY, minZ).getType())) return false;
-        if (!config.FRAME_TOP_VERTEX.contains(world.getBlockAt(maxX, maxY, maxZ).getType())) return false;
+        Debug.info("vertexTop");
+        if (!config.getMaterialTopVertex().contains(world.getBlockAt(minX, maxY, minZ).getType())) return false;
+        if (!config.getMaterialTopVertex().contains(world.getBlockAt(minX, maxY, maxZ).getType())) return false;
+        if (!config.getMaterialTopVertex().contains(world.getBlockAt(maxX, maxY, minZ).getType())) return false;
+        if (!config.getMaterialTopVertex().contains(world.getBlockAt(maxX, maxY, maxZ).getType())) return false;
         // edgeTop
-//        Bukkit.getLogger().info("edgeTop");
+        Debug.info("edgeTop");
         for (int x = minX + 1; x < maxX; x++) {
-            if (!config.FRAME_TOP_EDGE.contains(world.getBlockAt(x, maxY, minZ).getType())) return false;
-            if (!config.FRAME_TOP_EDGE.contains(world.getBlockAt(x, maxY, maxZ).getType())) return false;
+            if (!config.getMaterialTopEdge().contains(world.getBlockAt(x, maxY, minZ).getType())) return false;
+            if (!config.getMaterialTopEdge().contains(world.getBlockAt(x, maxY, maxZ).getType())) return false;
         }
         for (int z = minZ + 1; z < maxZ; z++) {
-            if (!config.FRAME_TOP_EDGE.contains(world.getBlockAt(minX, maxY, z).getType())) return false;
-            if (!config.FRAME_TOP_EDGE.contains(world.getBlockAt(maxX, maxY, z).getType())) return false;
+            if (!config.getMaterialTopEdge().contains(world.getBlockAt(minX, maxY, z).getType())) return false;
+            if (!config.getMaterialTopEdge().contains(world.getBlockAt(maxX, maxY, z).getType())) return false;
         }
-//        Bukkit.getLogger().info("valid!");
+        Debug.info("valid!");
         return true;
     }
 
