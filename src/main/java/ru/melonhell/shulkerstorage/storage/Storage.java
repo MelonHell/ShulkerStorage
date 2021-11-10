@@ -18,6 +18,8 @@ public class Storage {
     private final Block block1;
     private final Block block2;
     private final List<IGui> activeGuis = new ArrayList<>();
+    private List<ItemStack> itemStackList = new ArrayList<>();
+    private List<Inventory> inventoryList = new ArrayList<>();
 
     public List<Block> getBlocksInside() {
 
@@ -33,6 +35,7 @@ public class Storage {
 
         // Check valid
         if (maxX - minX < 2 || maxY - minY < 2 || maxZ - minZ < 2) return blockList;
+
 
         for (int x = minX + 1; x < maxX; x++) {
             for (int y = minY + 1; y < maxY; y++) {
@@ -62,7 +65,7 @@ public class Storage {
 
     private List<ItemStack> getItemStacks() {
         List<ItemStack> itemStackList = new ArrayList<>();
-        for (Inventory inventory : getInventories()) {
+        for (Inventory inventory : inventoryList) {
             for (ItemStack itemStack : inventory) {
                 if (itemStack != null) itemStackList.add(itemStack);
             }
@@ -92,12 +95,27 @@ public class Storage {
         if (!foo) storageItemList.add(new StorageItem(itemStack, itemStack.getAmount()));
     }
 
+    public void updateList() {
+        inventoryList = getInventories();
+        itemStackList = getItemStacks();
+    }
+
     public List<StorageItem> getStorageItems() {
         List<StorageItem> storageItemList = new ArrayList<>();
-        for (ItemStack itemStack : getItemStacks()) {
+        for (ItemStack itemStack : itemStackList) {
             addToStorageItemList(storageItemList, itemStack);
         }
         return storageItemList;
+    }
+
+    public int getEmptySlotsCount() {
+        int count = 0;
+        for (Inventory inventory : inventoryList) {
+            for (ItemStack itemStack : inventory) {
+                if (itemStack == null) count++;
+            }
+        }
+        return count;
     }
 
     public ItemStack pullItemStack(StorageItem storageItem) {

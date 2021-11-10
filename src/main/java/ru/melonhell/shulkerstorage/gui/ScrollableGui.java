@@ -11,11 +11,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import ru.melonhell.shulkerstorage.ShulkerStorage;
 import ru.melonhell.shulkerstorage.storage.StorageItem;
 import ru.melonhell.shulkerstorage.storage.Storage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -34,27 +36,6 @@ public class ScrollableGui extends AbstractGui {
         chestGui.addPane(masonryPane);
 
         navPane = new StaticPane(8, 0, 1, 6);
-        // SCROLL UP
-        navPane.fillWith(new ItemStack(background));
-        navPane.addItem(new GuiItem(new ItemStack(Material.ARROW), inventoryClickEvent -> {
-            if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) scroll(-1);
-        }), 0, 0);
-        // SCROLL DOWN
-        navPane.addItem(new GuiItem(new ItemStack(Material.ARROW), inventoryClickEvent -> {
-            if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) scroll(1);
-        }), 0, 5);
-        // SORT TYPE
-        navPane.addItem(new GuiItem(new ItemStack(Material.PAPER), inventoryClickEvent -> {
-            if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) {
-                changeSortType();
-                updateSortItemMeta(inventoryClickEvent.getCurrentItem());
-                refresh();
-            } else if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_HALF)) {
-                sortReverse = !sortReverse;
-                updateSortItemMeta(inventoryClickEvent.getCurrentItem());
-                refresh();
-            }
-        }), 0, 1);
         chestGui.addPane(navPane);
 
         chestGui.setOnClose(inventoryCloseEvent -> {
@@ -128,8 +109,37 @@ public class ScrollableGui extends AbstractGui {
     }
 
     private void refresh1() {
+        storage.updateList();
         List<StorageItem> storageItemList = storage.getStorageItems();
         SortUtils.sort(storageItemList, sortType, sortReverse);
+        navPane.clear();
+        // SCROLL UP
+        navPane.fillWith(new ItemStack(background));
+        navPane.addItem(new GuiItem(new ItemStack(Material.ARROW), inventoryClickEvent -> {
+            if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) scroll(-1);
+        }), 0, 0);
+        // SCROLL DOWN
+        navPane.addItem(new GuiItem(new ItemStack(Material.ARROW), inventoryClickEvent -> {
+            if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) scroll(1);
+        }), 0, 5);
+        // SORT TYPE
+        ItemStack sortItem = new ItemStack(Material.PAPER);
+        updateSortItemMeta(sortItem);
+        navPane.addItem(new GuiItem(sortItem, inventoryClickEvent -> {
+            if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                changeSortType();
+                refresh();
+            } else if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_HALF)) {
+                sortReverse = !sortReverse;
+                refresh();
+            }
+        }), 0, 1);
+        // INFO
+        ItemStack infoItem = new ItemStack(Material.BOOK);
+        ItemMeta meta = infoItem.getItemMeta();
+        meta.setLore(Arrays.asList("Empty slots: " + storage.getEmptySlotsCount()));
+        infoItem.setItemMeta(meta);
+        navPane.addItem(new GuiItem(infoItem, inventoryClickEvent -> {}), 0, 2);
         linePaneList.clear();
         for (int i = 0; i <= storageItemList.size() / 8; i++) {
             StaticPane linePane = new StaticPane(8, 1);
