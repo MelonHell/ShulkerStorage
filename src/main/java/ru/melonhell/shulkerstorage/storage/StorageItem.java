@@ -11,4 +11,8 @@ import org.bukkit.inventory.ItemStack;
 public class StorageItem {
     private ItemStack itemStack;
     private int amount;
+
+    public int getSlots() {
+        return (int) Math.ceil(amount * 1.0 / itemStack.getMaxStackSize());
+    }
 }

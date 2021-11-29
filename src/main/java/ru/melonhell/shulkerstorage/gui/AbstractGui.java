@@ -15,6 +15,7 @@ public abstract class AbstractGui implements IGui {
     protected final ChestGui chestGui;
     protected final ItemCreator itemCreator;
     protected SortUtils.SortType sortType = SortUtils.SortType.ID;
+    protected FilterUtils.FilterType filterType = FilterUtils.FilterType.ALL;
     protected boolean sortReverse = false;
 
     protected AbstractGui(Storage storage, ChestGui chestGui) {
@@ -29,16 +30,23 @@ public abstract class AbstractGui implements IGui {
         chestGui.show(player);
     }
 
-    protected void updateSortItemMeta(ItemStack itemStack) {
-        ItemMeta meta = itemStack.getItemMeta();
-        meta.setLore(Arrays.asList("Sort type: " + sortType.name(), "Sort reverse: " + sortReverse));
-        itemStack.setItemMeta(meta);
-    }
-
     protected void changeSortType() {
         int val = sortType.ordinal()+1;
         if (val >= SortUtils.SortType.values().length) val = 0;
         sortType = SortUtils.SortType.values()[val];
+    }
+
+    protected void changeFilterType(boolean back) {
+        int val;
+        if (!back) {
+            val = filterType.ordinal() + 1;
+            if (val >= FilterUtils.FilterType.values().length) val = 0;
+        } else {
+            val = filterType.ordinal() - 1;
+            if (val < 0) val = FilterUtils.FilterType.values().length - 1;
+        }
+        filterType = FilterUtils.FilterType.values()[val];
+
     }
 
     public abstract void refresh();

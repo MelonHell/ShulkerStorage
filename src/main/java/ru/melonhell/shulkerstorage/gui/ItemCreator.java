@@ -12,8 +12,9 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.melonhell.shulkerstorage.storage.StorageItem;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @AllArgsConstructor
 public class ItemCreator {
@@ -27,9 +28,13 @@ public class ItemCreator {
 
     public GuiItem createItem(StorageItem storageItem) {
         ItemStack itemStack = storageItem.getItemStack().clone();
-        itemStack.setAmount(1);
+        itemStack.setAmount(Math.min(storageItem.getAmount(), 64));
         ItemMeta meta = itemStack.getItemMeta();
-        meta.setLore(Collections.singletonList(ChatColor.GRAY + "Amount: " + storageItem.getAmount()));
+        List<String> lore = meta.getLore();
+        if (lore == null) lore = new ArrayList<>();
+        lore.add(ChatColor.GRAY + "Количество: " + storageItem.getAmount());
+        lore.add(ChatColor.GRAY + "Слоты: " + storageItem.getSlots());
+        meta.setLore(lore);
         itemStack.setItemMeta(meta);
         return new GuiItem(itemStack, inventoryClickEvent -> {
             InventoryAction action = inventoryClickEvent.getAction();

@@ -108,6 +108,10 @@ public class Storage {
         return storageItemList;
     }
 
+    public int getSlotsCount() {
+        return inventoryList.size() * 27;
+    }
+
     public int getEmptySlotsCount() {
         int count = 0;
         for (Inventory inventory : inventoryList) {

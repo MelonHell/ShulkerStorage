@@ -11,6 +11,7 @@ public class SortUtils {
     public enum SortType {
         ID,
         AMOUNT,
+        SLOTS,
         NAME,
     }
 
@@ -24,6 +25,9 @@ public class SortUtils {
                 break;
             case NAME:
                 storageItemList.sort(Comparator.comparing(storageItem -> storageItem.getItemStack().getType().name()));
+                break;
+            case SLOTS:
+                storageItemList.sort(Comparator.comparingInt(storageItem -> -storageItem.getSlots()));
                 break;
         }
         if (reverse) Collections.reverse(storageItemList);

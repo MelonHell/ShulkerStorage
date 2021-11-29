@@ -8,9 +8,13 @@ import com.github.stefvanschie.inventoryframework.pane.Pane;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.melonhell.shulkerstorage.ShulkerStorage;
 import ru.melonhell.shulkerstorage.storage.StorageItem;
@@ -23,7 +27,6 @@ import java.util.List;
 @Getter
 public class ScrollableGui extends AbstractGui {
 
-    private final Material background = Material.LIGHT_GRAY_STAINED_GLASS_PANE;
     private final MasonryPane masonryPane;
     private final StaticPane navPane;
     private final List<Pane> linePaneList = new ArrayList<>();
@@ -88,10 +91,14 @@ public class ScrollableGui extends AbstractGui {
     }
 
     private void scroll(int i) {
-        if (scrollPosition + i >= 0 && scrollPosition + i < linePaneList.size() - 5) {
-            scrollPosition += i;
-            updateGui();
+        for (int j = 0; j < Math.abs(i); j++) {
+            if (i > 0 && scrollPosition + 1 < linePaneList.size() - 5) {
+                scrollPosition++;
+            } else if (i < 0 && scrollPosition >= 1) {
+                scrollPosition--;
+            }
         }
+        updateGui();
     }
 
     private void updateGui() {
@@ -111,21 +118,24 @@ public class ScrollableGui extends AbstractGui {
     private void refresh1() {
         storage.updateList();
         List<StorageItem> storageItemList = storage.getStorageItems();
+        storageItemList = FilterUtils.filter(storageItemList, filterType);
         SortUtils.sort(storageItemList, sortType, sortReverse);
         navPane.clear();
         // SCROLL UP
-        navPane.fillWith(new ItemStack(background));
-        navPane.addItem(new GuiItem(new ItemStack(Material.ARROW), inventoryClickEvent -> {
+        navPane.fillWith(GuiItemCreator.getEmptyItem());
+        navPane.addItem(new GuiItem(GuiItemCreator.getScrollUpItem(), inventoryClickEvent -> {
             if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) scroll(-1);
+            else if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_HALF)) scroll(-6);
         }), 0, 0);
         // SCROLL DOWN
-        navPane.addItem(new GuiItem(new ItemStack(Material.ARROW), inventoryClickEvent -> {
+        navPane.addItem(new GuiItem(GuiItemCreator.getScrollDownItem(), inventoryClickEvent -> {
             if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) scroll(1);
+            else if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_HALF)) scroll(6);
         }), 0, 5);
+        // INFO
+        navPane.addItem(new GuiItem(GuiItemCreator.getInfoItem(storage.getSlotsCount(), storage.getEmptySlotsCount()), inventoryClickEvent -> {}), 0, 1);
         // SORT TYPE
-        ItemStack sortItem = new ItemStack(Material.PAPER);
-        updateSortItemMeta(sortItem);
-        navPane.addItem(new GuiItem(sortItem, inventoryClickEvent -> {
+        navPane.addItem(new GuiItem(GuiItemCreator.getSortItem(sortType, sortReverse), inventoryClickEvent -> {
             if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) {
                 changeSortType();
                 refresh();
@@ -133,13 +143,19 @@ public class ScrollableGui extends AbstractGui {
                 sortReverse = !sortReverse;
                 refresh();
             }
-        }), 0, 1);
-        // INFO
-        ItemStack infoItem = new ItemStack(Material.BOOK);
-        ItemMeta meta = infoItem.getItemMeta();
-        meta.setLore(Arrays.asList("Empty slots: " + storage.getEmptySlotsCount()));
-        infoItem.setItemMeta(meta);
-        navPane.addItem(new GuiItem(infoItem, inventoryClickEvent -> {}), 0, 2);
+        }), 0, 2);
+        // FILTER TYPE
+        navPane.addItem(new GuiItem(GuiItemCreator.getFilterItem(filterType), inventoryClickEvent -> {
+            if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_ALL)) {
+                scrollPosition = 0;
+                changeFilterType(false);
+                refresh();
+            } else if (inventoryClickEvent.getAction().equals(InventoryAction.PICKUP_HALF)) {
+                scrollPosition = 0;
+                changeFilterType(true);
+                refresh();
+            }
+        }), 0, 3);
         linePaneList.clear();
         for (int i = 0; i <= storageItemList.size() / 8; i++) {
             StaticPane linePane = new StaticPane(8, 1);
@@ -151,12 +167,12 @@ public class ScrollableGui extends AbstractGui {
                     linePane.addItem(itemCreator.createItem(storageItem), j, 0);
                 }
             }
-            linePane.fillWith(new ItemStack(background));
+            linePane.fillWith(GuiItemCreator.getEmptyItem());
         }
         for (int i = 0; i < 5; i++) {
             StaticPane linePane = new StaticPane(8, 1);
             linePaneList.add(linePane);
-            linePane.fillWith(new ItemStack(background));
+            linePane.fillWith(GuiItemCreator.getEmptyItem());
         }
         updateGui();
     }
