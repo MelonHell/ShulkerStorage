@@ -34,30 +34,25 @@ public class ScrollableGui extends AbstractGui {
 
     public ScrollableGui(Storage storage) {
         super(storage, new ChestGui(6, "ShulkerStorage"));
-        masonryPane = new MasonryPane(8, 6);
+        masonryPane = new MasonryPane(0, 0, 8, 6);
         masonryPane.setOrientation(Orientable.Orientation.VERTICAL);
         chestGui.addPane(masonryPane);
 
         navPane = new StaticPane(8, 0, 1, 6);
         chestGui.addPane(navPane);
 
-        chestGui.setOnClose(inventoryCloseEvent -> {
-            storage.getActiveGuis().remove(this);
-        });
+        chestGui.setOnClose(inventoryCloseEvent -> storage.getActiveGuis().remove(this));
 
         chestGui.setOnTopClick(inventoryClickEvent -> {
-//            inventoryClickEvent.getWhoClicked().sendMessage("top click " + inventoryClickEvent.getAction());
             inventoryClickEvent.setCancelled(true);
             if (inventoryClickEvent.getAction().equals(InventoryAction.PLACE_SOME)) {
-//                inventoryClickEvent.getWhoClicked().sendMessage("PLACE_SOME " + inventoryClickEvent.getClickedInventory());
-//                if (inventoryClickEvent.getClickedInventory().getType().equals(InventoryType.PLAYER))
                 inventoryClickEvent.setCancelled(false);
             }
             if (inventoryClickEvent.getAction().equals(InventoryAction.PLACE_ALL)) {
                 ItemStack cursor = inventoryClickEvent.getCursor();
                 if (cursor != null) {
                     ItemStack drop = storage.putItemStack(cursor);
-                    inventoryClickEvent.setCursor(drop);
+                    inventoryClickEvent.getView().setCursor(drop);
                 }
                 refreshAll();
             }
@@ -65,19 +60,15 @@ public class ScrollableGui extends AbstractGui {
                 ItemStack cursor = inventoryClickEvent.getCursor();
                 if (cursor != null) {
                     ItemStack drop = storage.putItemStack(cursor);
-                    inventoryClickEvent.setCursor(drop);
+                    inventoryClickEvent.getView().setCursor(drop);
                 }
                 refreshAll();
             }
         });
 
-        chestGui.setOnTopDrag(inventoryDragEvent -> {
-//            inventoryDragEvent.getWhoClicked().sendMessage("top drag " + inventoryDragEvent.getType());
-            inventoryDragEvent.setCancelled(true);
-        });
+        chestGui.setOnTopDrag(inventoryDragEvent -> inventoryDragEvent.setCancelled(true));
 
         chestGui.setOnBottomClick(inventoryClickEvent -> {
-//            inventoryClickEvent.getWhoClicked().sendMessage("bottom click " + inventoryClickEvent.getAction());
             if (inventoryClickEvent.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 inventoryClickEvent.setCancelled(true);
                 ItemStack cursor = inventoryClickEvent.getClickedInventory().getItem(inventoryClickEvent.getSlot());
